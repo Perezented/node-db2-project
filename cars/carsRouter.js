@@ -19,7 +19,7 @@ router.get("/:id", (req, res) => {
         .then((car) => {
             console.log(car);
             if (car.length > 0) {
-                res.status(200).json(car);
+                res.status(200).json(car[0]);
             } else
                 res.status(404).json({ Error: "Car is not in our database" });
         })
@@ -40,9 +40,9 @@ router.post("/", (req, res) => {
     } else {
         db("cars")
             .insert(newCar, "*")
-            .then((one) => {
+            .then((carid) => {
                 res.status(201).json({
-                    message: "New car added to data base",
+                    message: `New car added to data base. The carID is ${carid}`,
                     newCar,
                 });
             })
@@ -53,6 +53,52 @@ router.post("/", (req, res) => {
                 });
             });
     }
+});
+router.put("/:id", (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
+    db("cars")
+        .where({ id })
+        .update(changes)
+        .then((count) => {
+            console.log(count);
+            if (count > 0) {
+                res.status(203).json({
+                    message: "Record updated successfully",
+                    Changes: `${count} change(s) were done`,
+                });
+            } else {
+                res.status(404).json({
+                    error: "ID was not found in the data base",
+                });
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json(err);
+        });
+});
+router.delete("/:id", (req, res) => {
+    const id = req.params.id;
+    db("cars")
+        .where("carID", id)
+        .del()
+        .then((count) => {
+            console.log(count);
+            if (count > 0) {
+                res.status(203).json({
+                    message: `Record for ID ${id} deleted successfully`,
+                });
+            } else {
+                res.status(404).json({
+                    error: "ID was not found in the data base",
+                });
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json(err);
+        });
 });
 
 module.exports = router;
