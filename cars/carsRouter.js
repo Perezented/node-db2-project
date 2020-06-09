@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
             res.json(cars);
         })
         .catch((err) => {
-            res.status(500).json({ message: "Failed to retrieve cars" });
+            res.status(500).json({ message: "Failed to retrieve cars", err });
         });
 });
 
